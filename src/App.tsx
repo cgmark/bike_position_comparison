@@ -1,3 +1,4 @@
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import BikeForm from './components/BikeForm'
 import ComparisonChart from './components/ComparisonChart'
@@ -45,6 +46,7 @@ const defaultRiderSettings: RiderSettings = {
 }
 
 const STORAGE_KEY = 'bike-fit-compare-state'
+const SHARE_STATE_KEY = 'state'
 
 type PersistedState = {
   bikes: BikeInput[]
@@ -78,22 +80,49 @@ function normalizePersistedState(parsed: Partial<PersistedState>): PersistedStat
   return { bikes, referenceId, rider }
 }
 
-function loadPersistedState(): PersistedState {
-  if (typeof window === 'undefined') {
-    return getDefaultPersistedState()
-  }
-
-  const raw = window.localStorage.getItem(STORAGE_KEY)
-  if (!raw) {
-    return getDefaultPersistedState()
-  }
-
+function parsePersistedState(raw: string): PersistedState | null {
   try {
     const parsed = JSON.parse(raw) as Partial<PersistedState>
     return normalizePersistedState(parsed)
   } catch {
-    return getDefaultPersistedState()
+    return null
   }
+}
+
+function loadShareState(): PersistedState | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const hash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
+  const encodedState = new URLSearchParams(hash).get(SHARE_STATE_KEY)
+  if (!encodedState) {
+    return null
+  }
+
+  const decompressedState = decompressFromEncodedURIComponent(encodedState)
+  if (!decompressedState) {
+    return null
+  }
+
+  return parsePersistedState(decompressedState)
+}
+
+function loadPersistedState(): PersistedState | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const raw = window.localStorage.getItem(STORAGE_KEY)
+  if (!raw) {
+    return null
+  }
+
+  return parsePersistedState(raw)
+}
+
+function loadInitialState(): PersistedState {
+  return loadShareState() ?? loadPersistedState() ?? getDefaultPersistedState()
 }
 
 function makeNewBike(index: number): BikeInput {
@@ -129,11 +158,13 @@ const preventWheelValueChange = (event: React.WheelEvent<HTMLInputElement>) => {
 }
 
 export default function App() {
-  const [persistedState] = useState(loadPersistedState)
+  const [persistedState] = useState(loadInitialState)
   const [bikes, setBikes] = useState<BikeInput[]>(persistedState.bikes)
   const [referenceId, setReferenceId] = useState(persistedState.referenceId)
   const [rider, setRider] = useState<RiderSettings>(persistedState.rider)
+  const [copyLinkLabel, setCopyLinkLabel] = useState('Copy Link')
   const importInputRef = useRef<HTMLInputElement>(null)
+  const copyLinkTimeoutRef = useRef<number | null>(null)
 
   const derivedBikes = useMemo(() => bikes.map((bike) => deriveBike(bike, rider)), [bikes, rider])
 
@@ -147,6 +178,14 @@ export default function App() {
       }),
     )
   }, [bikes, referenceId, rider])
+
+  useEffect(() => {
+    return () => {
+      if (copyLinkTimeoutRef.current !== null) {
+        window.clearTimeout(copyLinkTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const updateBike = (id: string, key: keyof BikeInput, value: string | number | boolean) => {
     setBikes((current) =>
@@ -236,6 +275,34 @@ export default function App() {
     setRider(next.rider)
   }
 
+  const setCopyLinkFeedback = (label: string) => {
+    setCopyLinkLabel(label)
+
+    if (copyLinkTimeoutRef.current !== null) {
+      window.clearTimeout(copyLinkTimeoutRef.current)
+    }
+
+    copyLinkTimeoutRef.current = window.setTimeout(() => {
+      setCopyLinkLabel('Copy Link')
+      copyLinkTimeoutRef.current = null
+    }, 2000)
+  }
+
+  const copyShareLink = async () => {
+    const sharedState: PersistedState = { bikes, referenceId, rider }
+    const compressedState = compressToEncodedURIComponent(JSON.stringify(sharedState))
+    const shareUrl = new URL(window.location.href)
+    shareUrl.hash = `${SHARE_STATE_KEY}=${compressedState}`
+
+    try {
+      await navigator.clipboard.writeText(shareUrl.toString())
+      setCopyLinkFeedback('Copied')
+    } catch {
+      window.prompt('Copy this link:', shareUrl.toString())
+      setCopyLinkFeedback('Ready')
+    }
+  }
+
   const exportState = () => {
     const data: PersistedState = { bikes, referenceId, rider }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -287,6 +354,9 @@ export default function App() {
             </div>
             <div className="sidebar-actions">
               <div className="sidebar-action-group">
+                <button type="button" className="ghost-button" onClick={copyShareLink}>
+                  {copyLinkLabel}
+                </button>
                 <button type="button" className="ghost-button" onClick={exportState}>
                   Export
                 </button>
