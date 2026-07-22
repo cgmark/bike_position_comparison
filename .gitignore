@@ -1,3 +1,4 @@
 node_modules/
 dist/
 *.tsbuildinfo
+bike-fit-compare-*.json
