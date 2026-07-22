@@ -96,6 +96,18 @@ button {
   gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
+}
+
+.sidebar-action-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
+}
+
+.sidebar-actions > .solid-button {
+  margin-left: auto;
 }
 
 .bike-list {

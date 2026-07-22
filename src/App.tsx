@@ -286,15 +286,17 @@ export default function App() {
               <p>Edit geometry and fit inputs for each bike.</p>
             </div>
             <div className="sidebar-actions">
-              <button type="button" className="ghost-button" onClick={exportState}>
-                Export
-              </button>
-              <button type="button" className="ghost-button" onClick={openImportPicker}>
-                Import
-              </button>
-              <button type="button" className="ghost-button" onClick={resetState}>
-                Reset
-              </button>
+              <div className="sidebar-action-group">
+                <button type="button" className="ghost-button" onClick={exportState}>
+                  Export
+                </button>
+                <button type="button" className="ghost-button" onClick={openImportPicker}>
+                  Import
+                </button>
+                <button type="button" className="ghost-button" onClick={resetState}>
+                  Reset
+                </button>
+              </div>
               <button type="button" className="solid-button" onClick={addBike}>
                 Add Bike
               </button>
