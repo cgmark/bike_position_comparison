@@ -226,6 +226,11 @@ button {
   padding: 4px;
 }
 
+.help-button,
+.icon-button[data-tooltip] {
+  position: relative;
+}
+
 .help-button {
   width: 18px;
   height: 18px;
@@ -240,6 +245,60 @@ button {
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1;
+}
+
+.help-button::after,
+.icon-button[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  width: max-content;
+  max-width: min(280px, calc(100vw - 32px));
+  padding: 8px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.98);
+  box-shadow: 0 16px 30px rgba(2, 6, 23, 0.4);
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+  z-index: 2;
+}
+
+.field-label-with-help .help-button::after {
+  left: 0;
+  transform: translateY(4px);
+}
+
+.bike-card-actions .icon-button[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: translateY(4px);
+}
+
+.help-button:hover::after,
+.help-button:focus-visible::after,
+.icon-button[data-tooltip]:hover::after,
+.icon-button[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.field-label-with-help .help-button:hover::after,
+.field-label-with-help .help-button:focus-visible::after {
+  transform: translateY(0);
+}
+
+.bike-card-actions .icon-button[data-tooltip]:hover::after,
+.bike-card-actions .icon-button[data-tooltip]:focus-visible::after {
+  transform: translateY(0);
 }
 
 .checkbox-label {

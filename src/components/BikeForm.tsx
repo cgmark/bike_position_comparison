@@ -76,7 +76,7 @@ export default function BikeForm({
             className={bike.locked ? 'icon-button icon-button-active' : 'icon-button'}
             onClick={() => onChange(bike.id, 'locked', !bike.locked)}
             aria-label={bike.locked ? 'Unlock bike settings' : 'Lock bike settings'}
-            title={bike.locked ? 'Unlock bike settings' : 'Lock bike settings'}
+            data-tooltip={bike.locked ? 'Unlock bike settings' : 'Lock bike settings'}
           >
             <svg viewBox="0 0 16 16" aria-hidden="true">
               {bike.locked ? (
@@ -99,7 +99,7 @@ export default function BikeForm({
             onClick={() => onMoveUp(bike.id)}
             disabled={!canMoveUp}
             aria-label="Move bike up"
-            title="Move bike up"
+            data-tooltip="Move bike up"
           >
             <svg viewBox="0 0 16 16" aria-hidden="true">
               <path d="M4 10L8 6L12 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -111,7 +111,7 @@ export default function BikeForm({
             onClick={() => onMoveDown(bike.id)}
             disabled={!canMoveDown}
             aria-label="Move bike down"
-            title="Move bike down"
+            data-tooltip="Move bike down"
           >
             <svg viewBox="0 0 16 16" aria-hidden="true">
               <path d="M4 6L8 10L12 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -122,7 +122,7 @@ export default function BikeForm({
             className="icon-button"
             onClick={() => onDuplicate(bike.id)}
             aria-label="Duplicate bike"
-            title="Duplicate bike"
+            data-tooltip="Duplicate bike"
           >
             <svg viewBox="0 0 16 16" aria-hidden="true">
               <rect x="5" y="3" width="8" height="10" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
@@ -135,7 +135,7 @@ export default function BikeForm({
             onClick={handleRemove}
             disabled={!canRemove}
             aria-label="Remove bike"
-            title="Remove bike"
+            data-tooltip="Remove bike"
           >
             <svg viewBox="0 0 16 16" aria-hidden="true">
               <path d="M4 4L12 12M12 4L4 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />

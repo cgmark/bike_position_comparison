@@ -20,7 +20,7 @@ export default function ComparisonTable({ bikes, referenceId }: ComparisonTableP
               type="button"
               className="help-button"
               aria-label="Position comparison help"
-              title="All values are in mm."
+              data-tooltip="All values are in mm."
             >
               ?
             </button>

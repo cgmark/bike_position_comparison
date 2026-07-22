@@ -586,7 +586,7 @@ export default function App() {
                     type="button"
                     className="help-button"
                     aria-label="Saddle height help"
-                    title="Measured from the bottom of the pedal stroke, in line with the seat tube, to the top of the saddle."
+                    data-tooltip="Measured from the bottom of the pedal stroke, in line with the seat tube, to the top of the saddle."
                   >
                     ?
                   </button>
