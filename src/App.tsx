@@ -54,6 +54,27 @@ type PersistedState = {
   rider: RiderSettings
 }
 
+type GeometryGeeksImport = {
+  name: string
+  stack?: number
+  reach?: number
+  seatTubeAngle?: number
+  headTubeAngle?: number
+  crankLength?: number
+  stemLength?: number
+}
+
+type GeometryGeeksNumericField = Exclude<keyof GeometryGeeksImport, 'name'>
+
+const geometryGeeksFieldMap: Record<string, GeometryGeeksNumericField> = {
+  Reach: 'reach',
+  Stack: 'stack',
+  'Seat Angle': 'seatTubeAngle',
+  'Head Angle': 'headTubeAngle',
+  'Crank Length': 'crankLength',
+  'Stem Length': 'stemLength',
+}
+
 function getDefaultPersistedState(): PersistedState {
   return {
     bikes: sampleBikes,
@@ -125,6 +146,79 @@ function loadInitialState(): PersistedState {
   return loadShareState() ?? loadPersistedState() ?? getDefaultPersistedState()
 }
 
+function parseGeometryGeeksValue(rawValue: string): number | undefined {
+  const match = rawValue.match(/-?\d+(?:\.\d+)?/)
+  if (!match) {
+    return undefined
+  }
+
+  return Number(match[0])
+}
+
+function parseGeometryGeeksImport(text: string): GeometryGeeksImport[] | null {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  const chooseBaselineIndex = lines.findIndex((line) => line === 'Choose Baseline')
+  if (chooseBaselineIndex === -1) {
+    return null
+  }
+
+  const importedBikes: GeometryGeeksImport[] = []
+  for (let lineIndex = chooseBaselineIndex - 1; lineIndex > 0; lineIndex -= 2) {
+    const detail = lines[lineIndex]
+    if (!detail.includes(':')) {
+      break
+    }
+
+    const name = lines[lineIndex - 1]
+    importedBikes.push({ name: `${name} ${detail}` })
+  }
+
+  importedBikes.reverse()
+  if (importedBikes.length === 0) {
+    return null
+  }
+
+  const removeIndex = lines.findIndex((line, index) => index > chooseBaselineIndex && line === 'Remove')
+  const rowLines = lines.slice(chooseBaselineIndex + 1, removeIndex === -1 ? lines.length : removeIndex)
+
+  for (const line of rowLines) {
+    if (!line.includes('\t')) {
+      continue
+    }
+
+    const [rawLabel, ...rawValues] = line.split('\t')
+    const field = geometryGeeksFieldMap[rawLabel.trim()]
+    if (!field) {
+      continue
+    }
+
+    for (let bikeIndex = 0; bikeIndex < importedBikes.length; bikeIndex += 1) {
+      const parsedValue = parseGeometryGeeksValue(rawValues[bikeIndex] ?? '')
+      if (parsedValue === undefined) {
+        continue
+      }
+
+      importedBikes[bikeIndex][field] = parsedValue
+    }
+  }
+
+  const hasSupportedFields = importedBikes.some(
+    (bike) =>
+      bike.stack !== undefined ||
+      bike.reach !== undefined ||
+      bike.seatTubeAngle !== undefined ||
+      bike.headTubeAngle !== undefined ||
+      bike.crankLength !== undefined ||
+      bike.stemLength !== undefined,
+  )
+
+  return hasSupportedFields ? importedBikes : null
+}
+
 function makeNewBike(index: number): BikeInput {
   return {
     id: `bike-${Date.now()}-${index}`,
@@ -163,7 +257,10 @@ export default function App() {
   const [referenceId, setReferenceId] = useState(persistedState.referenceId)
   const [rider, setRider] = useState<RiderSettings>(persistedState.rider)
   const [copyLinkLabel, setCopyLinkLabel] = useState('Copy Link')
+  const [isGeometryGeeksModalOpen, setIsGeometryGeeksModalOpen] = useState(false)
+  const [geometryGeeksPasteText, setGeometryGeeksPasteText] = useState('')
   const importInputRef = useRef<HTMLInputElement>(null)
+  const geometryGeeksTextareaRef = useRef<HTMLTextAreaElement>(null)
   const copyLinkTimeoutRef = useRef<number | null>(null)
 
   const derivedBikes = useMemo(() => bikes.map((bike) => deriveBike(bike, rider)), [bikes, rider])
@@ -186,6 +283,14 @@ export default function App() {
       }
     }
   }, [])
+
+  useEffect(() => {
+    if (!isGeometryGeeksModalOpen) {
+      return
+    }
+
+    geometryGeeksTextareaRef.current?.focus()
+  }, [isGeometryGeeksModalOpen])
 
   const updateBike = (id: string, key: keyof BikeInput, value: string | number | boolean) => {
     setBikes((current) =>
@@ -303,6 +408,38 @@ export default function App() {
     }
   }
 
+  const openGeometryGeeksModal = () => {
+    setIsGeometryGeeksModalOpen(true)
+  }
+
+  const closeGeometryGeeksModal = () => {
+    setIsGeometryGeeksModalOpen(false)
+    setGeometryGeeksPasteText('')
+  }
+
+  const importGeometryGeeksText = () => {
+    if (!geometryGeeksPasteText.trim()) {
+      return
+    }
+
+    const importedBikes = parseGeometryGeeksImport(geometryGeeksPasteText)
+    if (!importedBikes) {
+      window.alert('Could not parse Geometry Geeks comparison text.')
+      return
+    }
+
+    setBikes((current) => [
+      ...current,
+      ...importedBikes.map((importedBike, index) => ({
+        ...makeNewBike(current.length + index),
+        ...importedBike,
+        id: `bike-${Date.now()}-${current.length + index}`,
+      })),
+    ])
+
+    closeGeometryGeeksModal()
+  }
+
   const exportState = () => {
     const data: PersistedState = { bikes, referenceId, rider }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -341,6 +478,57 @@ export default function App() {
 
   return (
     <main className="app-shell">
+      {isGeometryGeeksModalOpen ? (
+        <div className="modal-backdrop" role="presentation" onClick={closeGeometryGeeksModal}>
+          <section
+            className="modal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="geometry-geeks-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div>
+                <h2 id="geometry-geeks-modal-title">Import From Geometry Geeks</h2>
+                <p>
+                  Go to the Geometry Geeks comparison page, select all text on the page, copy it, then paste it below.
+                </p>
+              </div>
+              <button type="button" className="icon-button" onClick={closeGeometryGeeksModal} aria-label="Close import dialog">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M4 4L12 12M12 4L4 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+
+            <label className="field">
+              <span>Geometry Geeks Page Text</span>
+              <textarea
+                ref={geometryGeeksTextareaRef}
+                className="paste-textarea"
+                value={geometryGeeksPasteText}
+                onChange={(event) => setGeometryGeeksPasteText(event.target.value)}
+                rows={14}
+              />
+            </label>
+
+            <div className="modal-actions">
+              <button type="button" className="ghost-button" onClick={closeGeometryGeeksModal}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="solid-button"
+                onClick={importGeometryGeeksText}
+                disabled={!geometryGeeksPasteText.trim()}
+              >
+                Import
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
       <section className="hero panel">
         <h1>Bike Position Comparison</h1>
       </section>
@@ -367,6 +555,9 @@ export default function App() {
                   Reset
                 </button>
               </div>
+              <button type="button" className="ghost-button" onClick={openGeometryGeeksModal}>
+                Paste GG
+              </button>
               <button type="button" className="solid-button" onClick={addBike}>
                 Add Bike
               </button>
