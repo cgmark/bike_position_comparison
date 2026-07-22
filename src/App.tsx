@@ -171,17 +171,7 @@ function parseGeometryGeeksValue(rawValue: string): number | undefined {
   return Number(match[0])
 }
 
-function parseGeometryGeeksImport(text: string): GeometryGeeksImport[] | null {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-
-  const chooseBaselineIndex = lines.findIndex((line) => line === 'Choose Baseline')
-  if (chooseBaselineIndex === -1) {
-    return null
-  }
-
+function parseGeometryGeeksImportAtIndex(lines: string[], chooseBaselineIndex: number): GeometryGeeksImport[] | null {
   const importedBikes: GeometryGeeksImport[] = []
   for (let lineIndex = chooseBaselineIndex - 1; lineIndex > 0; lineIndex -= 2) {
     const detail = lines[lineIndex]
@@ -233,6 +223,30 @@ function parseGeometryGeeksImport(text: string): GeometryGeeksImport[] | null {
   )
 
   return hasSupportedFields ? importedBikes : null
+}
+
+function parseGeometryGeeksImport(text: string): GeometryGeeksImport[] | null {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  const chooseBaselineIndexes = lines.reduce<number[]>((indexes, line, index) => {
+    if (line === 'Choose Baseline') {
+      indexes.push(index)
+    }
+
+    return indexes
+  }, [])
+
+  for (let index = chooseBaselineIndexes.length - 1; index >= 0; index -= 1) {
+    const parsedImport = parseGeometryGeeksImportAtIndex(lines, chooseBaselineIndexes[index])
+    if (parsedImport) {
+      return parsedImport
+    }
+  }
+
+  return null
 }
 
 function makeNewBike(index: number): BikeInput {
