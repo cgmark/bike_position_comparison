@@ -223,6 +223,19 @@ export default function App() {
     }))
   }
 
+  const resetState = () => {
+    const confirmed = window.confirm('Reset all bikes and rider settings back to the default sample data?')
+    if (!confirmed) {
+      return
+    }
+
+    const next = getDefaultPersistedState()
+    window.localStorage.removeItem(STORAGE_KEY)
+    setBikes(next.bikes)
+    setReferenceId(next.referenceId)
+    setRider(next.rider)
+  }
+
   const exportState = () => {
     const data: PersistedState = { bikes, referenceId, rider }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -278,6 +291,9 @@ export default function App() {
               </button>
               <button type="button" className="ghost-button" onClick={openImportPicker}>
                 Import
+              </button>
+              <button type="button" className="ghost-button" onClick={resetState}>
+                Reset
               </button>
               <button type="button" className="solid-button" onClick={addBike}>
                 Add Bike
