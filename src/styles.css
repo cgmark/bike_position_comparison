@@ -83,6 +83,21 @@ button {
   box-shadow: 0 20px 50px rgba(2, 6, 23, 0.45);
 }
 
+.modal-defaults-section {
+  display: grid;
+  gap: 12px;
+}
+
+.modal-defaults-section h3 {
+  margin: 0;
+}
+
+.modal-defaults-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .hero {
   margin-bottom: 20px;
   padding: 24px;
@@ -477,6 +492,10 @@ th {
   }
 
   .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-defaults-grid {
     grid-template-columns: 1fr;
   }
 

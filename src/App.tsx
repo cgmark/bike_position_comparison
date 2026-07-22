@@ -64,6 +64,14 @@ type GeometryGeeksImport = {
   stemLength?: number
 }
 
+type GeometryGeeksImportDefaults = {
+  crankLength: number
+  saddleSetback: number
+  stemLength: number
+  stemAngle: number
+  spacersBelowStem: number
+}
+
 type GeometryGeeksNumericField = Exclude<keyof GeometryGeeksImport, 'name'>
 
 const geometryGeeksFieldMap: Record<string, GeometryGeeksNumericField> = {
@@ -73,6 +81,14 @@ const geometryGeeksFieldMap: Record<string, GeometryGeeksNumericField> = {
   'Head Angle': 'headTubeAngle',
   'Crank Length': 'crankLength',
   'Stem Length': 'stemLength',
+}
+
+const defaultGeometryGeeksImportDefaults: GeometryGeeksImportDefaults = {
+  crankLength: 170,
+  saddleSetback: 0,
+  stemLength: 100,
+  stemAngle: -6,
+  spacersBelowStem: 20,
 }
 
 function getDefaultPersistedState(): PersistedState {
@@ -259,6 +275,9 @@ export default function App() {
   const [copyLinkLabel, setCopyLinkLabel] = useState('Copy Link')
   const [isGeometryGeeksModalOpen, setIsGeometryGeeksModalOpen] = useState(false)
   const [geometryGeeksPasteText, setGeometryGeeksPasteText] = useState('')
+  const [geometryGeeksImportDefaults, setGeometryGeeksImportDefaults] = useState<GeometryGeeksImportDefaults>(
+    defaultGeometryGeeksImportDefaults,
+  )
   const importInputRef = useRef<HTMLInputElement>(null)
   const geometryGeeksTextareaRef = useRef<HTMLTextAreaElement>(null)
   const copyLinkTimeoutRef = useRef<number | null>(null)
@@ -417,6 +436,13 @@ export default function App() {
     setGeometryGeeksPasteText('')
   }
 
+  const updateGeometryGeeksImportDefault = (key: keyof GeometryGeeksImportDefaults, value: number) => {
+    setGeometryGeeksImportDefaults((current) => ({
+      ...current,
+      [key]: value,
+    }))
+  }
+
   const importGeometryGeeksText = () => {
     if (!geometryGeeksPasteText.trim()) {
       return
@@ -432,6 +458,7 @@ export default function App() {
       ...current,
       ...importedBikes.map((importedBike, index) => ({
         ...makeNewBike(current.length + index),
+        ...geometryGeeksImportDefaults,
         ...importedBike,
         id: `bike-${Date.now()}-${current.length + index}`,
       })),
@@ -511,6 +538,74 @@ export default function App() {
                 rows={14}
               />
             </label>
+
+            <section className="modal-defaults-section">
+              <div>
+                <h3>Import Defaults</h3>
+                <p>These values fill in fields that Geometry Geeks does not provide in the copied text.</p>
+              </div>
+
+              <div className="modal-defaults-grid">
+                <label className="field">
+                  <span>Crank Length</span>
+                  <input
+                    type="number"
+                    step="1"
+                    value={geometryGeeksImportDefaults.crankLength}
+                    onWheel={preventWheelValueChange}
+                    onChange={(event) => updateGeometryGeeksImportDefault('crankLength', Number(event.target.value))}
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Saddle Setback</span>
+                  <input
+                    type="number"
+                    step="1"
+                    value={geometryGeeksImportDefaults.saddleSetback}
+                    onWheel={preventWheelValueChange}
+                    onChange={(event) =>
+                      updateGeometryGeeksImportDefault('saddleSetback', Number(event.target.value))
+                    }
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Stem Length</span>
+                  <input
+                    type="number"
+                    step="1"
+                    value={geometryGeeksImportDefaults.stemLength}
+                    onWheel={preventWheelValueChange}
+                    onChange={(event) => updateGeometryGeeksImportDefault('stemLength', Number(event.target.value))}
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Stem Angle</span>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={geometryGeeksImportDefaults.stemAngle}
+                    onWheel={preventWheelValueChange}
+                    onChange={(event) => updateGeometryGeeksImportDefault('stemAngle', Number(event.target.value))}
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Spacers</span>
+                  <input
+                    type="number"
+                    step="1"
+                    value={geometryGeeksImportDefaults.spacersBelowStem}
+                    onWheel={preventWheelValueChange}
+                    onChange={(event) =>
+                      updateGeometryGeeksImportDefault('spacersBelowStem', Number(event.target.value))
+                    }
+                  />
+                </label>
+              </div>
+            </section>
 
             <div className="modal-actions">
               <button type="button" className="ghost-button" onClick={closeGeometryGeeksModal}>
