@@ -645,11 +645,8 @@ export default function App() {
       <section className="layout">
         <aside className="sidebar">
           <div className="sidebar-header">
-            <div>
-              <h2>Bikes</h2>
-              <p>Edit geometry and fit inputs for each bike.</p>
-            </div>
             <div className="sidebar-actions">
+              <h2 className="sidebar-actions-title">Actions</h2>
               <div className="sidebar-action-group">
                 <button type="button" className="ghost-button" onClick={copyShareLink}>
                   {copyLinkLabel}
@@ -664,12 +661,14 @@ export default function App() {
                   Reset
                 </button>
               </div>
-              <button type="button" className="ghost-button" onClick={openGeometryGeeksModal}>
-                Paste GG
-              </button>
-              <button type="button" className="solid-button" onClick={addBike}>
-                Add Bike
-              </button>
+              <div className="sidebar-action-group sidebar-action-group-secondary">
+                <button type="button" className="ghost-button" onClick={openGeometryGeeksModal}>
+                  Paste GG
+                </button>
+                <button type="button" className="solid-button" onClick={addBike}>
+                  Add Bike
+                </button>
+              </div>
               <input
                 ref={importInputRef}
                 className="sr-only"
@@ -680,12 +679,12 @@ export default function App() {
             </div>
           </div>
 
-          <section className="bike-card">
-            <div className="bike-card-header">
-              <div>
-                <h3>Rider Settings</h3>
+            <section className="bike-card">
+              <div className="bike-card-header">
+                <div>
+                  <h2 className="sidebar-actions-title">Rider Settings</h2>
+                </div>
               </div>
-            </div>
 
             <div className="field-grid">
               <label className="field">

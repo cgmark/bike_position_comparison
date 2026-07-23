@@ -27,6 +27,7 @@ button {
 }
 
 .app-shell {
+  --sidebar-panel-width: 336px;
   width: min(1500px, calc(100vw - 32px));
   margin: 0 auto;
   padding: 24px 0 32px;
@@ -34,7 +35,7 @@ button {
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+  grid-template-columns: var(--sidebar-panel-width) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -129,23 +130,44 @@ button {
   align-items: start;
 }
 
+.sidebar-header {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+
+.bike-card-header {
+  display: grid;
+  gap: 10px;
+}
+
 .sidebar-actions {
-  display: flex;
+  display: grid;
   gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: start;
+  justify-items: start;
+  width: var(--sidebar-panel-width);
+  justify-self: start;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.sidebar-actions-title {
+  margin: 0;
+  font-size: 0.95rem;
 }
 
 .sidebar-action-group {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
   gap: 8px;
-  flex-wrap: nowrap;
-  flex: 0 0 auto;
 }
 
-.sidebar-actions > .solid-button {
-  margin-left: auto;
+.sidebar-action-group-secondary {
+  margin-left: 0;
 }
 
 .bike-list {
@@ -157,6 +179,12 @@ button {
   padding: 12px;
 }
 
+.bike-list .bike-card,
+.sidebar > .bike-card {
+  width: var(--sidebar-panel-width);
+  max-width: 100%;
+}
+
 .bike-name-input {
   border: none;
   border-bottom: 1px solid rgba(148, 163, 184, 0.3);
@@ -165,7 +193,7 @@ button {
   font-size: 0.95rem;
   font-weight: 700;
   width: 100%;
-  padding: 2px 0;
+  padding: 2px 0 6px;
 }
 
 .bike-name-input:disabled,
@@ -184,6 +212,7 @@ button {
 
 .bike-card-actions {
   flex-wrap: nowrap;
+  justify-content: flex-end;
 }
 
 .inline-controls {
@@ -192,8 +221,12 @@ button {
 
 .field-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 92px));
   gap: 6px;
+}
+
+.bike-card > .field-grid {
+  margin-top: 6px;
 }
 
 .field {
@@ -241,8 +274,25 @@ button {
   padding: 4px;
 }
 
+.icon-color-picker {
+  overflow: visible;
+}
+
+.icon-color-picker input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.icon-color-picker svg {
+  width: 13px;
+  height: 13px;
+}
+
 .help-button,
-.icon-button[data-tooltip] {
+.icon-button[data-tooltip],
+.icon-color-picker[data-tooltip] {
   position: relative;
 }
 
@@ -263,7 +313,8 @@ button {
 }
 
 .help-button::after,
-.icon-button[data-tooltip]::after {
+.icon-button[data-tooltip]::after,
+.icon-color-picker[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
   left: 50%;
@@ -298,10 +349,18 @@ button {
   transform: translateY(4px);
 }
 
+.bike-card-actions .icon-color-picker[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: translateY(4px);
+}
+
 .help-button:hover::after,
 .help-button:focus-visible::after,
 .icon-button[data-tooltip]:hover::after,
-.icon-button[data-tooltip]:focus-visible::after {
+.icon-button[data-tooltip]:focus-visible::after,
+.icon-color-picker[data-tooltip]:hover::after,
+.icon-color-picker[data-tooltip]:focus-within::after {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
@@ -316,11 +375,9 @@ button {
   transform: translateY(0);
 }
 
-.checkbox-label {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  color: #cbd5e1;
+.bike-card-actions .icon-color-picker[data-tooltip]:hover::after,
+.bike-card-actions .icon-color-picker[data-tooltip]:focus-within::after {
+  transform: translateY(0);
 }
 
 .solid-button,
@@ -466,6 +523,7 @@ th {
     max-height: none;
     overflow-y: visible;
     padding-right: 0;
+    --sidebar-panel-width: 100%;
   }
 
   .layout {
@@ -481,13 +539,14 @@ th {
 
   .sidebar-actions {
     justify-content: flex-start;
+    padding: 10px;
   }
 
   .sidebar-action-group {
-    flex-wrap: wrap;
+    grid-template-columns: 1fr;
   }
 
-  .sidebar-actions > .solid-button {
+  .sidebar-action-group-secondary {
     margin-left: 0;
   }
 

@@ -63,13 +63,6 @@ export default function BikeForm({
   return (
     <section className="bike-card">
       <div className="bike-card-header">
-        <input
-          className="bike-name-input"
-          value={bike.name}
-          disabled={bike.locked}
-          onChange={(event) => onChange(bike.id, 'name', event.target.value)}
-          aria-label="Bike name"
-        />
         <div className="bike-card-actions">
           <button
             type="button"
@@ -91,6 +84,63 @@ export default function BikeForm({
                   <path d="M10.5 5.8L12.6 4.3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
                 </>
               )}
+            </svg>
+          </button>
+          <button
+            type="button"
+            className={bike.visible ? 'icon-button icon-button-active' : 'icon-button'}
+            onClick={() => onChange(bike.id, 'visible', !bike.visible)}
+            aria-label={bike.visible ? 'Hide bike' : 'Show bike'}
+            data-tooltip={bike.visible ? 'Hide bike' : 'Show bike'}
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              {bike.visible ? (
+                <>
+                  <path d="M1.8 8C3.2 5.4 5.3 4 8 4s4.8 1.4 6.2 4c-1.4 2.6-3.5 4-6.2 4S3.2 10.6 1.8 8Z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                  <circle cx="8" cy="8" r="1.9" fill="none" stroke="currentColor" strokeWidth="1.4" />
+                </>
+              ) : (
+                <>
+                  <path d="M2.2 2.2L13.8 13.8" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                  <path d="M4.1 4.1C5.2 3.4 6.5 3 8 3c2.7 0 4.8 1.4 6.2 4-.6 1.1-1.4 2-2.2 2.6" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M11 11.2C10.1 11.7 9.1 12 8 12c-2.7 0-4.8-1.4-6.2-4 .5-.9 1.1-1.7 1.8-2.3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </>
+              )}
+            </svg>
+          </button>
+          <label
+            className="icon-button icon-color-picker"
+            data-tooltip="Bike color"
+            style={{ backgroundColor: bike.color, color: '#020617' }}
+          >
+            <input
+              type="color"
+              value={bike.color}
+              onChange={(event) => onChange(bike.id, 'color', event.target.value)}
+              aria-label="Bike color"
+            />
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path
+                d="M9.8 2.2a1.9 1.9 0 0 1 2.7 0l1.3 1.3a1.9 1.9 0 0 1 0 2.7l-1.1 1.1-1.5-1.5-.9.9 1.5 1.5-4.9 4.9H5.1V11l4.7-4.7-1.5-1.5.9-.9 1.5 1.5 1.1-1.1a.6.6 0 0 0 0-.8l-1.3-1.3a.6.6 0 0 0-.8 0L8.6 3.3l-.9-.9 2.1-2.1Z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            </svg>
+          </label>
+          <button
+            type="button"
+            className={isReference ? 'icon-button icon-button-active' : 'icon-button'}
+            onClick={() => onSetReference(bike.id)}
+            aria-label={isReference ? 'Reference bike' : 'Set as reference bike'}
+            data-tooltip={isReference ? 'Reference bike' : 'Set as reference bike'}
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.4" />
+              <circle cx="8" cy="8" r="2.1" fill="none" stroke="currentColor" strokeWidth="1.4" />
+              <path d="M8 1.6V4M8 12V14.4M1.6 8H4M12 8H14.4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
             </svg>
           </button>
           <button
@@ -142,34 +192,13 @@ export default function BikeForm({
             </svg>
           </button>
         </div>
-      </div>
-
-      <div className="inline-controls">
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={bike.visible}
-            onChange={(event) => onChange(bike.id, 'visible', event.target.checked)}
-          />
-          Visible
-        </label>
-
-        <label className="field compact-field">
-          <span>Color</span>
-          <input
-            type="color"
-            value={bike.color}
-            onChange={(event) => onChange(bike.id, 'color', event.target.value)}
-          />
-        </label>
-
-        <button
-          type="button"
-          className={isReference ? 'solid-button' : 'ghost-button'}
-          onClick={() => onSetReference(bike.id)}
-        >
-          {isReference ? 'Reference Bike' : 'Set Reference'}
-        </button>
+        <input
+          className="bike-name-input"
+          value={bike.name}
+          disabled={bike.locked}
+          onChange={(event) => onChange(bike.id, 'name', event.target.value)}
+          aria-label="Bike name"
+        />
       </div>
 
       <div className="field-grid">
