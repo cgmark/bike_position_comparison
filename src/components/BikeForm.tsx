@@ -181,14 +181,17 @@ export default function BikeForm({
           </button>
           <button
             type="button"
-            className="icon-button icon-button-delete"
+            className="icon-button icon-button-delete icon-button-tooltip-end"
             onClick={handleRemove}
             disabled={!canRemove}
             aria-label="Remove bike"
             data-tooltip="Remove bike"
           >
             <svg viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M4 4L12 12M12 4L4 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <path d="M3.5 4.5H12.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <path d="M6 2.8H10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <path d="M5 4.5V11.8C5 12.5 5.5 13 6.2 13H9.8C10.5 13 11 12.5 11 11.8V4.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+              <path d="M7 6.2V10.8M9 6.2V10.8" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
             </svg>
           </button>
         </div>

@@ -343,12 +343,13 @@ button {
   transform: translateY(4px);
 }
 
-.bike-card-actions .icon-button[data-tooltip]::after {
-  left: auto;
-  right: 0;
+.bike-card-actions > :first-child::after {
+  left: 0;
+  right: auto;
   transform: translateY(4px);
 }
 
+.icon-button-tooltip-end::after,
 .bike-card-actions .icon-color-picker[data-tooltip]::after {
   left: auto;
   right: 0;
@@ -370,11 +371,13 @@ button {
   transform: translateY(0);
 }
 
-.bike-card-actions .icon-button[data-tooltip]:hover::after,
-.bike-card-actions .icon-button[data-tooltip]:focus-visible::after {
+.bike-card-actions > :first-child:hover::after,
+.bike-card-actions > :first-child:focus-visible::after {
   transform: translateY(0);
 }
 
+.icon-button-tooltip-end:hover::after,
+.icon-button-tooltip-end:focus-visible::after,
 .bike-card-actions .icon-color-picker[data-tooltip]:hover::after,
 .bike-card-actions .icon-color-picker[data-tooltip]:focus-within::after {
   transform: translateY(0);
