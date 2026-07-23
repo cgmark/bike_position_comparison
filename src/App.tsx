@@ -54,6 +54,11 @@ type PersistedState = {
   rider: RiderSettings
 }
 
+type InitialState = {
+  persistedState: PersistedState
+  consumedShareState: boolean
+}
+
 type GeometryGeeksImport = {
   name: string
   stack?: number
@@ -158,8 +163,19 @@ function loadPersistedState(): PersistedState | null {
   return parsePersistedState(raw)
 }
 
-function loadInitialState(): PersistedState {
-  return loadShareState() ?? loadPersistedState() ?? getDefaultPersistedState()
+function loadInitialState(): InitialState {
+  const sharedState = loadShareState()
+  if (sharedState) {
+    return {
+      persistedState: sharedState,
+      consumedShareState: true,
+    }
+  }
+
+  return {
+    persistedState: loadPersistedState() ?? getDefaultPersistedState(),
+    consumedShareState: false,
+  }
 }
 
 function parseGeometryGeeksValue(rawValue: string): number | undefined {
@@ -282,7 +298,7 @@ const preventWheelValueChange = (event: React.WheelEvent<HTMLInputElement>) => {
 }
 
 export default function App() {
-  const [persistedState] = useState(loadInitialState)
+  const [{ persistedState, consumedShareState }] = useState(loadInitialState)
   const [bikes, setBikes] = useState<BikeInput[]>(persistedState.bikes)
   const [referenceId, setReferenceId] = useState(persistedState.referenceId)
   const [rider, setRider] = useState<RiderSettings>(persistedState.rider)
@@ -324,6 +340,16 @@ export default function App() {
 
     geometryGeeksTextareaRef.current?.focus()
   }, [isGeometryGeeksModalOpen])
+
+  useEffect(() => {
+    if (!consumedShareState) {
+      return
+    }
+
+    const cleanUrl = new URL(window.location.href)
+    cleanUrl.hash = ''
+    window.history.replaceState(window.history.state, '', cleanUrl.toString())
+  }, [consumedShareState])
 
   const updateBike = (id: string, key: keyof BikeInput, value: string | number | boolean) => {
     setBikes((current) =>
