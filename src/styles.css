@@ -170,16 +170,132 @@ button {
   margin-left: 0;
 }
 
-.bike-list {
-  display: grid;
-  gap: 10px;
+.bike-editor-panel {
+  padding: 20px;
+}
+
+.bike-editor-wrap {
+  overflow-x: auto;
+  margin-top: 10px;
+}
+
+.bike-editor-table {
+  min-width: 1195px;
+  font-size: 0.8rem;
+}
+
+.bike-editor-table th,
+.bike-editor-table td {
+  padding: 6px 5px;
+  vertical-align: top;
+}
+
+.bike-editor-table th {
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.bike-editor-table td > input[type='number'] {
+  width: 52px;
+  padding: 5px 3px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 7px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #f8fafc;
+}
+
+.bike-editor-actions-column,
+.bike-editor-name-column {
+  position: sticky;
+  background: #0f172a;
+  z-index: 1;
+}
+
+.bike-editor-actions-column {
+  left: 0;
+  min-width: 192px;
+}
+
+.bike-editor-name-column {
+  left: 192px;
+  min-width: 130px;
+}
+
+.bike-editor-table thead .bike-editor-actions-column,
+.bike-editor-table thead .bike-editor-name-column {
+  z-index: 2;
+}
+
+.bike-row-dragging {
+  opacity: 0.45;
+}
+
+.bike-row-drop-target td {
+  border-top: 2px solid #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.bike-row-drop-target .bike-editor-actions-column,
+.bike-row-drop-target .bike-editor-name-column {
+  background: #10243a;
+}
+
+.bike-table-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bike-drag-handle {
+  cursor: grab;
+}
+
+.bike-drag-handle:active {
+  cursor: grabbing;
+}
+
+.table-action-button {
+  padding: 5px 7px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #e2e8f0;
+  font-size: 0.72rem;
+}
+
+.table-action-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.table-action-delete {
+  color: #fda4af;
+}
+
+.bike-color-picker {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.bike-color-picker input {
+  position: absolute;
+  inset: -3px;
+  width: calc(100% + 6px);
+  height: calc(100% + 6px);
+  opacity: 0;
+  cursor: pointer;
 }
 
 .bike-card {
   padding: 12px;
 }
 
-.bike-list .bike-card,
 .sidebar > .bike-card {
   width: var(--sidebar-panel-width);
   max-width: 100%;
