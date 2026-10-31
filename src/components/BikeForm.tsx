@@ -1,4 +1,5 @@
 import type { BikeInput } from '../types'
+import { bikeNumberLimits } from '../validation'
 import ValidatedNumberInput from './ValidatedNumberInput'
 
 type BikeFormProps = {
@@ -24,15 +25,15 @@ type NumberField = {
 }
 
 const numberFields: NumberField[] = [
-  { key: 'stack', label: 'Stack', min: 1 },
-  { key: 'reach', label: 'Reach', min: 1 },
-  { key: 'seatTubeAngle', label: 'STA', step: 0.1, min: 1, max: 179 },
-  { key: 'headTubeAngle', label: 'HTA', step: 0.1, min: 1, max: 179 },
-  { key: 'crankLength', label: 'Crank', min: 1 },
-  { key: 'saddleSetback', label: 'Setback' },
-  { key: 'stemLength', label: 'Stem', min: 0 },
-  { key: 'stemAngle', label: 'Stem Angle', step: 0.1, min: -90, max: 90 },
-  { key: 'spacersBelowStem', label: 'Spacers', min: 0 },
+  { key: 'stack', label: 'Stack', ...bikeNumberLimits.stack },
+  { key: 'reach', label: 'Reach', ...bikeNumberLimits.reach },
+  { key: 'seatTubeAngle', label: 'STA', step: 0.1, ...bikeNumberLimits.seatTubeAngle },
+  { key: 'headTubeAngle', label: 'HTA', step: 0.1, ...bikeNumberLimits.headTubeAngle },
+  { key: 'crankLength', label: 'Crank', ...bikeNumberLimits.crankLength },
+  { key: 'saddleSetback', label: 'Setback', ...bikeNumberLimits.saddleSetback },
+  { key: 'stemLength', label: 'Stem', ...bikeNumberLimits.stemLength },
+  { key: 'stemAngle', label: 'Stem Angle', step: 0.1, ...bikeNumberLimits.stemAngle },
+  { key: 'spacersBelowStem', label: 'Spacers', ...bikeNumberLimits.spacersBelowStem },
 ]
 
 export default function BikeForm({

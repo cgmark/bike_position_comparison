@@ -6,6 +6,13 @@ import ComparisonTable from './components/ComparisonTable'
 import ValidatedNumberInput from './components/ValidatedNumberInput'
 import { deriveBike } from './geometry'
 import type { BikeInput, RiderSettings } from './types'
+import {
+  bikeNumberLimits,
+  saddleHeightLimits,
+  validateBike,
+  validatePersistedState,
+  type PersistedState,
+} from './validation'
 
 const sampleBikes: BikeInput[] = [
   {
@@ -48,12 +55,6 @@ const defaultRiderSettings: RiderSettings = {
 
 const STORAGE_KEY = 'bike-fit-compare-state'
 const SHARE_STATE_KEY = 'state'
-
-type PersistedState = {
-  bikes: BikeInput[]
-  referenceId: string
-  rider: RiderSettings
-}
 
 type InitialState = {
   persistedState: PersistedState
@@ -105,28 +106,9 @@ function getDefaultPersistedState(): PersistedState {
   }
 }
 
-function normalizePersistedState(parsed: Partial<PersistedState>): PersistedState {
-  const fallback = getDefaultPersistedState()
-  const bikes =
-    Array.isArray(parsed.bikes) && parsed.bikes.length > 0
-      ? parsed.bikes.map((bike, index) => normalizeBike(bike, makeNewBike(index)))
-      : fallback.bikes
-  const referenceId =
-    typeof parsed.referenceId === 'string' && bikes.some((bike) => bike.id === parsed.referenceId)
-      ? parsed.referenceId
-      : bikes[0].id
-  const rider = {
-    ...defaultRiderSettings,
-    ...parsed.rider,
-  }
-
-  return { bikes, referenceId, rider }
-}
-
 function parsePersistedState(raw: string): PersistedState | null {
   try {
-    const parsed = JSON.parse(raw) as Partial<PersistedState>
-    return normalizePersistedState(parsed)
+    return validatePersistedState(JSON.parse(raw))
   } catch {
     return null
   }
@@ -156,12 +138,12 @@ function loadPersistedState(): PersistedState | null {
     return null
   }
 
-  const raw = window.localStorage.getItem(STORAGE_KEY)
-  if (!raw) {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY)
+    return raw ? parsePersistedState(raw) : null
+  } catch {
     return null
   }
-
-  return parsePersistedState(raw)
 }
 
 function loadInitialState(): InitialState {
@@ -282,15 +264,6 @@ function makeNewBike(index: number): BikeInput {
     stemLength: 100,
     stemAngle: -6,
     spacersBelowStem: 20,
-  }
-}
-
-function normalizeBike(bike: Partial<BikeInput>, fallback: BikeInput): BikeInput {
-  return {
-    ...fallback,
-    ...bike,
-    locked: typeof bike.locked === 'boolean' ? bike.locked : false,
-    saddleSetback: typeof bike.saddleSetback === 'number' ? bike.saddleSetback : 0,
   }
 }
 
@@ -491,15 +464,20 @@ export default function App() {
       return
     }
 
-    setBikes((current) => [
-      ...current,
-      ...importedBikes.map((importedBike, index) => ({
-        ...makeNewBike(current.length + index),
+    const nextBikes = importedBikes.map((importedBike, index) =>
+      validateBike({
+        ...makeNewBike(bikes.length + index),
         ...geometryGeeksImportDefaults,
         ...importedBike,
-        id: `bike-${Date.now()}-${current.length + index}`,
-      })),
-    ])
+        id: `bike-${Date.now()}-${bikes.length + index}`,
+      }),
+    )
+    if (nextBikes.some((bike) => bike === null)) {
+      window.alert('Could not import Geometry Geeks text because it contains an invalid value.')
+      return
+    }
+
+    setBikes((current) => [...current, ...(nextBikes as BikeInput[])])
 
     closeGeometryGeeksModal()
   }
@@ -528,8 +506,10 @@ export default function App() {
 
     try {
       const text = await file.text()
-      const parsed = JSON.parse(text) as Partial<PersistedState>
-      const next = normalizePersistedState(parsed)
+      const next = parsePersistedState(text)
+      if (!next) {
+        throw new Error('Invalid import state')
+      }
       setBikes(next.bikes)
       setReferenceId(next.referenceId)
       setRider(next.rider)
@@ -587,7 +567,7 @@ export default function App() {
                   <span>Crank Length</span>
                   <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.crankLength}
-                    min={1}
+                    min={bikeNumberLimits.crankLength.min}
                     onCommit={(value) => updateGeometryGeeksImportDefault('crankLength', value)}
                   />
                 </label>
@@ -604,7 +584,7 @@ export default function App() {
                   <span>Stem Length</span>
                   <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.stemLength}
-                    min={0}
+                    min={bikeNumberLimits.stemLength.min}
                     onCommit={(value) => updateGeometryGeeksImportDefault('stemLength', value)}
                   />
                 </label>
@@ -613,8 +593,8 @@ export default function App() {
                   <span>Stem Angle</span>
                   <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.stemAngle}
-                    min={-90}
-                    max={90}
+                    min={bikeNumberLimits.stemAngle.min}
+                    max={bikeNumberLimits.stemAngle.max}
                     step={0.1}
                     onCommit={(value) => updateGeometryGeeksImportDefault('stemAngle', value)}
                   />
@@ -624,7 +604,7 @@ export default function App() {
                   <span>Spacers</span>
                   <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.spacersBelowStem}
-                    min={0}
+                    min={bikeNumberLimits.spacersBelowStem.min}
                     onCommit={(value) => updateGeometryGeeksImportDefault('spacersBelowStem', value)}
                   />
                 </label>
@@ -711,7 +691,7 @@ export default function App() {
                 </span>
                 <ValidatedNumberInput
                   value={rider.saddleHeight}
-                  min={1}
+                  min={saddleHeightLimits.min}
                   onCommit={updateSaddleHeight}
                 />
               </label>
