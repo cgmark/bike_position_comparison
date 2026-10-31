@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import BikeForm from './components/BikeForm'
 import ComparisonChart from './components/ComparisonChart'
 import ComparisonTable from './components/ComparisonTable'
+import ValidatedNumberInput from './components/ValidatedNumberInput'
 import { deriveBike } from './geometry'
 import type { BikeInput, RiderSettings } from './types'
 
@@ -291,10 +292,6 @@ function normalizeBike(bike: Partial<BikeInput>, fallback: BikeInput): BikeInput
     locked: typeof bike.locked === 'boolean' ? bike.locked : false,
     saddleSetback: typeof bike.saddleSetback === 'number' ? bike.saddleSetback : 0,
   }
-}
-
-const preventWheelValueChange = (event: React.WheelEvent<HTMLInputElement>) => {
-  event.currentTarget.blur()
 }
 
 export default function App() {
@@ -588,60 +585,47 @@ export default function App() {
               <div className="modal-defaults-grid">
                 <label className="field">
                   <span>Crank Length</span>
-                  <input
-                    type="number"
-                    step="1"
+                  <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.crankLength}
-                    onWheel={preventWheelValueChange}
-                    onChange={(event) => updateGeometryGeeksImportDefault('crankLength', Number(event.target.value))}
+                    min={1}
+                    onCommit={(value) => updateGeometryGeeksImportDefault('crankLength', value)}
                   />
                 </label>
 
                 <label className="field">
                   <span>Saddle Setback</span>
-                  <input
-                    type="number"
-                    step="1"
+                  <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.saddleSetback}
-                    onWheel={preventWheelValueChange}
-                    onChange={(event) =>
-                      updateGeometryGeeksImportDefault('saddleSetback', Number(event.target.value))
-                    }
+                    onCommit={(value) => updateGeometryGeeksImportDefault('saddleSetback', value)}
                   />
                 </label>
 
                 <label className="field">
                   <span>Stem Length</span>
-                  <input
-                    type="number"
-                    step="1"
+                  <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.stemLength}
-                    onWheel={preventWheelValueChange}
-                    onChange={(event) => updateGeometryGeeksImportDefault('stemLength', Number(event.target.value))}
+                    min={0}
+                    onCommit={(value) => updateGeometryGeeksImportDefault('stemLength', value)}
                   />
                 </label>
 
                 <label className="field">
                   <span>Stem Angle</span>
-                  <input
-                    type="number"
-                    step="0.1"
+                  <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.stemAngle}
-                    onWheel={preventWheelValueChange}
-                    onChange={(event) => updateGeometryGeeksImportDefault('stemAngle', Number(event.target.value))}
+                    min={-90}
+                    max={90}
+                    step={0.1}
+                    onCommit={(value) => updateGeometryGeeksImportDefault('stemAngle', value)}
                   />
                 </label>
 
                 <label className="field">
                   <span>Spacers</span>
-                  <input
-                    type="number"
-                    step="1"
+                  <ValidatedNumberInput
                     value={geometryGeeksImportDefaults.spacersBelowStem}
-                    onWheel={preventWheelValueChange}
-                    onChange={(event) =>
-                      updateGeometryGeeksImportDefault('spacersBelowStem', Number(event.target.value))
-                    }
+                    min={0}
+                    onCommit={(value) => updateGeometryGeeksImportDefault('spacersBelowStem', value)}
                   />
                 </label>
               </div>
@@ -725,12 +709,10 @@ export default function App() {
                     ?
                   </button>
                 </span>
-                <input
-                  type="number"
-                  step="1"
+                <ValidatedNumberInput
                   value={rider.saddleHeight}
-                  onWheel={preventWheelValueChange}
-                  onChange={(event) => updateSaddleHeight(Number(event.target.value))}
+                  min={1}
+                  onCommit={updateSaddleHeight}
                 />
               </label>
             </div>

@@ -1,4 +1,5 @@
 import type { BikeInput } from '../types'
+import ValidatedNumberInput from './ValidatedNumberInput'
 
 type BikeFormProps = {
   bike: BikeInput
@@ -18,22 +19,20 @@ type NumberField = {
   key: keyof BikeInput
   label: string
   step?: number
-}
-
-const preventWheelValueChange = (event: React.WheelEvent<HTMLInputElement>) => {
-  event.currentTarget.blur()
+  min?: number
+  max?: number
 }
 
 const numberFields: NumberField[] = [
-  { key: 'stack', label: 'Stack' },
-  { key: 'reach', label: 'Reach' },
-  { key: 'seatTubeAngle', label: 'STA', step: 0.1 },
-  { key: 'headTubeAngle', label: 'HTA', step: 0.1 },
-  { key: 'crankLength', label: 'Crank' },
+  { key: 'stack', label: 'Stack', min: 1 },
+  { key: 'reach', label: 'Reach', min: 1 },
+  { key: 'seatTubeAngle', label: 'STA', step: 0.1, min: 1, max: 179 },
+  { key: 'headTubeAngle', label: 'HTA', step: 0.1, min: 1, max: 179 },
+  { key: 'crankLength', label: 'Crank', min: 1 },
   { key: 'saddleSetback', label: 'Setback' },
-  { key: 'stemLength', label: 'Stem' },
-  { key: 'stemAngle', label: 'Stem Angle', step: 0.1 },
-  { key: 'spacersBelowStem', label: 'Spacers' },
+  { key: 'stemLength', label: 'Stem', min: 0 },
+  { key: 'stemAngle', label: 'Stem Angle', step: 0.1, min: -90, max: 90 },
+  { key: 'spacersBelowStem', label: 'Spacers', min: 0 },
 ]
 
 export default function BikeForm({
@@ -208,13 +207,13 @@ export default function BikeForm({
         {numberFields.map((field) => (
           <label key={field.key} className="field">
             <span>{field.label}</span>
-            <input
-              type="number"
-              step={field.step ?? 1}
+            <ValidatedNumberInput
               value={bike[field.key] as number}
               disabled={bike.locked}
-              onWheel={preventWheelValueChange}
-              onChange={(event) => onChange(bike.id, field.key, Number(event.target.value))}
+              step={field.step}
+              min={field.min}
+              max={field.max}
+              onCommit={(value) => onChange(bike.id, field.key, value)}
             />
           </label>
         ))}
