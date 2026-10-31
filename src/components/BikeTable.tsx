@@ -44,9 +44,6 @@ export default function BikeTable({ bikes, onChange, onRemove, onDuplicate, onMo
 
   return (
     <section className="panel bike-editor-panel">
-      <div className="panel-header">
-        <h2 className="sidebar-actions-title">Bike Settings &amp; Position Comparison</h2>
-      </div>
       <div className="bike-editor-wrap">
         <table className="bike-editor-table">
           <thead>
@@ -217,9 +214,9 @@ export default function BikeTable({ bikes, onChange, onRemove, onDuplicate, onMo
                     />
                   </td>
                 ))}
-                  <td>{formatMm(saddleToBarDistance)}</td>
-                  <td>{formatMm(saddleToBarDrop)}</td>
-                  <td>{formatMm(saddleToBarHorizontal)}</td>
+                  <td className="comparison-value">{formatMm(saddleToBarDistance)}</td>
+                  <td className="comparison-value">{formatMm(saddleToBarDrop)}</td>
+                  <td className="comparison-value">{formatMm(saddleToBarHorizontal)}</td>
                 </tr>
               )
             })}

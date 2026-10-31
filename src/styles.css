@@ -35,23 +35,27 @@ button {
 
 .layout {
   display: grid;
-  grid-template-columns: var(--sidebar-panel-width) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
 
-.sidebar,
 .main-content {
   display: grid;
   gap: 20px;
 }
 
-.sidebar {
-  position: sticky;
-  top: 24px;
-  max-height: calc(100vh - 48px);
-  overflow-y: auto;
-  padding-right: 6px;
+.controls-panel {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+}
+
+.controls-panel .sidebar-actions {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .panel,
@@ -161,13 +165,10 @@ button {
 }
 
 .sidebar-action-group {
-  display: grid;
-  grid-template-columns: repeat(2, max-content);
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 8px;
-}
-
-.sidebar-action-group-secondary {
-  margin-left: 0;
 }
 
 .bike-editor-panel {
@@ -193,6 +194,10 @@ button {
 .bike-editor-table th {
   font-size: 0.72rem;
   white-space: nowrap;
+}
+
+.bike-editor-table .comparison-value {
+  font-weight: 700;
 }
 
 .bike-editor-table td > input[type='number'] {
@@ -592,27 +597,6 @@ button {
   stroke-width: 1;
 }
 
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.legend-item,
-.table-bike-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.legend-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  display: inline-block;
-}
-
 .table-wrap {
   overflow-x: auto;
   margin-top: 16px;
@@ -659,14 +643,6 @@ th {
   .sidebar-actions {
     justify-content: flex-start;
     padding: 10px;
-  }
-
-  .sidebar-action-group {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar-action-group-secondary {
-    margin-left: 0;
   }
 
   .field-grid {

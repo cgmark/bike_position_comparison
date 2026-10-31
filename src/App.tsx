@@ -618,13 +618,18 @@ export default function App() {
         </div>
       ) : null}
 
-      <section className="hero panel">
-        <h1>Bike Position Comparison</h1>
-      </section>
-
       <section className="layout">
-        <aside className="sidebar">
-          <div className="sidebar-header">
+        <section className="main-content">
+          <ComparisonChart bikes={derivedBikes} />
+          <BikeTable
+            bikes={derivedBikes}
+            onChange={updateBike}
+            onRemove={removeBike}
+            onDuplicate={duplicateBike}
+            onMove={moveBike}
+          />
+
+          <section className="panel controls-panel">
             <div className="sidebar-actions">
               <h2 className="sidebar-actions-title">Actions</h2>
               <div className="sidebar-action-group">
@@ -640,8 +645,6 @@ export default function App() {
                 <button type="button" className="ghost-button" onClick={resetState}>
                   Reset
                 </button>
-              </div>
-              <div className="sidebar-action-group sidebar-action-group-secondary">
                 <button type="button" className="ghost-button" onClick={openGeometryGeeksModal}>
                   Paste GG
                 </button>
@@ -657,14 +660,14 @@ export default function App() {
                 onChange={importState}
               />
             </div>
-          </div>
+          </section>
 
-            <section className="bike-card">
-              <div className="bike-card-header">
-                <div>
-                  <h2 className="sidebar-actions-title">Rider Settings</h2>
-                </div>
+          <section className="panel controls-panel">
+            <div className="bike-card-header">
+              <div>
+                <h2 className="sidebar-actions-title">Rider Settings</h2>
               </div>
+            </div>
 
             <div className="field-grid">
               <label className="field">
@@ -687,18 +690,6 @@ export default function App() {
               </label>
             </div>
           </section>
-
-        </aside>
-
-        <section className="main-content">
-          <ComparisonChart bikes={derivedBikes} />
-          <BikeTable
-            bikes={derivedBikes}
-            onChange={updateBike}
-            onRemove={removeBike}
-            onDuplicate={duplicateBike}
-            onMove={moveBike}
-          />
         </section>
       </section>
     </main>

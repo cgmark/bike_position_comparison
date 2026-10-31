@@ -98,14 +98,6 @@ export default function ComparisonChart({ bikes }: ComparisonChartProps) {
         </text>
       </svg>
 
-      <div className="legend">
-        {visibleBikes.map((bike) => (
-          <div key={bike.input.id} className="legend-item">
-            <span className="legend-swatch" style={{ backgroundColor: bike.input.color }} />
-            <span>{bike.input.name}</span>
-          </div>
-        ))}
-      </div>
     </section>
   )
 }
