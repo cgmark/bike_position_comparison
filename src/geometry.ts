@@ -10,12 +10,6 @@ const polar = (angleDegrees: number, length: number): Point => {
   }
 }
 
-export function getEffectiveTopTube(stack: number, reach: number, seatTubeAngle: number): number {
-  const angle = toRadians(seatTubeAngle)
-  const seatTubeXAtStack = -stack / Math.tan(angle)
-  return reach - seatTubeXAtStack
-}
-
 export function deriveBike(input: BikeInput, rider: RiderSettings): DerivedBike {
   const bottomBracket = { x: 0, y: 0 }
   const crankEnd = polar(-input.seatTubeAngle, input.crankLength)

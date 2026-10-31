@@ -1,8 +1,7 @@
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import BikeForm from './components/BikeForm'
+import BikeTable from './components/BikeTable'
 import ComparisonChart from './components/ComparisonChart'
-import ComparisonTable from './components/ComparisonTable'
 import ValidatedNumberInput from './components/ValidatedNumberInput'
 import { deriveBike } from './geometry'
 import type { BikeInput, RiderSettings } from './types'
@@ -353,20 +352,20 @@ export default function App() {
     })
   }
 
-  const moveBike = (id: string, direction: -1 | 1) => {
+  const moveBike = (id: string, targetId: string) => {
     setBikes((current) => {
-      const index = current.findIndex((bike) => bike.id === id)
-      if (index === -1) {
-        return current
-      }
-
-      const targetIndex = index + direction
-      if (targetIndex < 0 || targetIndex >= current.length) {
+      const sourceIndex = current.findIndex((bike) => bike.id === id)
+      if (sourceIndex === -1 || id === targetId) {
         return current
       }
 
       const next = [...current]
-      const [bike] = next.splice(index, 1)
+      const [bike] = next.splice(sourceIndex, 1)
+      const targetIndex = next.findIndex((candidate) => candidate.id === targetId)
+      if (targetIndex === -1) {
+        return current
+      }
+
       next.splice(targetIndex, 0, bike)
       return next
     })
@@ -619,13 +618,18 @@ export default function App() {
         </div>
       ) : null}
 
-      <section className="hero panel">
-        <h1>Bike Position Comparison</h1>
-      </section>
-
       <section className="layout">
-        <aside className="sidebar">
-          <div className="sidebar-header">
+        <section className="main-content">
+          <ComparisonChart bikes={derivedBikes} />
+          <BikeTable
+            bikes={derivedBikes}
+            onChange={updateBike}
+            onRemove={removeBike}
+            onDuplicate={duplicateBike}
+            onMove={moveBike}
+          />
+
+          <section className="panel controls-panel">
             <div className="sidebar-actions">
               <h2 className="sidebar-actions-title">Actions</h2>
               <div className="sidebar-action-group">
@@ -641,8 +645,6 @@ export default function App() {
                 <button type="button" className="ghost-button" onClick={resetState}>
                   Reset
                 </button>
-              </div>
-              <div className="sidebar-action-group sidebar-action-group-secondary">
                 <button type="button" className="ghost-button" onClick={openGeometryGeeksModal}>
                   Paste GG
                 </button>
@@ -658,14 +660,14 @@ export default function App() {
                 onChange={importState}
               />
             </div>
-          </div>
+          </section>
 
-            <section className="bike-card">
-              <div className="bike-card-header">
-                <div>
-                  <h2 className="sidebar-actions-title">Rider Settings</h2>
-                </div>
+          <section className="panel controls-panel">
+            <div className="bike-card-header">
+              <div>
+                <h2 className="sidebar-actions-title">Rider Settings</h2>
               </div>
+            </div>
 
             <div className="field-grid">
               <label className="field">
@@ -688,28 +690,6 @@ export default function App() {
               </label>
             </div>
           </section>
-
-          <div className="bike-list">
-            {bikes.map((bike) => (
-              <BikeForm
-                key={bike.id}
-                bike={bike}
-                onChange={updateBike}
-                onRemove={removeBike}
-                onDuplicate={duplicateBike}
-                onMoveUp={(id) => moveBike(id, -1)}
-                onMoveDown={(id) => moveBike(id, 1)}
-                canRemove={bikes.length > 1}
-                canMoveUp={bikes[0]?.id !== bike.id}
-                canMoveDown={bikes[bikes.length - 1]?.id !== bike.id}
-              />
-            ))}
-          </div>
-        </aside>
-
-        <section className="main-content">
-          <ComparisonChart bikes={derivedBikes} />
-          <ComparisonTable bikes={derivedBikes} />
         </section>
       </section>
     </main>
