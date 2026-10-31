@@ -9,8 +9,6 @@ type BikeFormProps = {
   onDuplicate: (id: string) => void
   onMoveUp: (id: string) => void
   onMoveDown: (id: string) => void
-  onSetReference: (id: string) => void
-  isReference: boolean
   canRemove: boolean
   canMoveUp: boolean
   canMoveDown: boolean
@@ -43,8 +41,6 @@ export default function BikeForm({
   onDuplicate,
   onMoveUp,
   onMoveDown,
-  onSetReference,
-  isReference,
   canRemove,
   canMoveUp,
   canMoveDown,
@@ -130,19 +126,6 @@ export default function BikeForm({
               />
             </svg>
           </label>
-          <button
-            type="button"
-            className={isReference ? 'icon-button icon-button-active' : 'icon-button'}
-            onClick={() => onSetReference(bike.id)}
-            aria-label={isReference ? 'Reference bike' : 'Set as reference bike'}
-            data-tooltip={isReference ? 'Reference bike' : 'Set as reference bike'}
-          >
-            <svg viewBox="0 0 16 16" aria-hidden="true">
-              <circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.4" />
-              <circle cx="8" cy="8" r="2.1" fill="none" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M8 1.6V4M8 12V14.4M1.6 8H4M12 8H14.4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-            </svg>
-          </button>
           <button
             type="button"
             className="icon-button"

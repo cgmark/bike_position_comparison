@@ -56,13 +56,6 @@ export function deriveBike(input: BikeInput, rider: RiderSettings): DerivedBike 
   }
 }
 
-export function getDelta(point: Point, reference: Point): Point {
-  return {
-    x: point.x - reference.x,
-    y: point.y - reference.y,
-  }
-}
-
 export function getDistance(a: Point, b: Point): number {
   return Math.hypot(b.x - a.x, b.y - a.y)
 }

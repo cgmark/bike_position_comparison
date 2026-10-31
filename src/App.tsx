@@ -101,7 +101,6 @@ const defaultGeometryGeeksImportDefaults: GeometryGeeksImportDefaults = {
 function getDefaultPersistedState(): PersistedState {
   return {
     bikes: sampleBikes,
-    referenceId: sampleBikes[0].id,
     rider: defaultRiderSettings,
   }
 }
@@ -270,7 +269,6 @@ function makeNewBike(index: number): BikeInput {
 export default function App() {
   const [{ persistedState, consumedShareState }] = useState(loadInitialState)
   const [bikes, setBikes] = useState<BikeInput[]>(persistedState.bikes)
-  const [referenceId, setReferenceId] = useState(persistedState.referenceId)
   const [rider, setRider] = useState<RiderSettings>(persistedState.rider)
   const [copyLinkLabel, setCopyLinkLabel] = useState('Copy Link')
   const [isGeometryGeeksModalOpen, setIsGeometryGeeksModalOpen] = useState(false)
@@ -289,11 +287,10 @@ export default function App() {
       STORAGE_KEY,
       JSON.stringify({
         bikes,
-        referenceId,
         rider,
       }),
     )
-  }, [bikes, referenceId, rider])
+  }, [bikes, rider])
 
   useEffect(() => {
     return () => {
@@ -381,11 +378,7 @@ export default function App() {
         return current
       }
 
-      const next = current.filter((bike) => bike.id !== id)
-      if (referenceId === id && next[0]) {
-        setReferenceId(next[0].id)
-      }
-      return next
+      return current.filter((bike) => bike.id !== id)
     })
   }
 
@@ -405,7 +398,6 @@ export default function App() {
     const next = getDefaultPersistedState()
     window.localStorage.removeItem(STORAGE_KEY)
     setBikes(next.bikes)
-    setReferenceId(next.referenceId)
     setRider(next.rider)
   }
 
@@ -423,7 +415,7 @@ export default function App() {
   }
 
   const copyShareLink = async () => {
-    const sharedState: PersistedState = { bikes, referenceId, rider }
+    const sharedState: PersistedState = { bikes, rider }
     const compressedState = compressToEncodedURIComponent(JSON.stringify(sharedState))
     const shareUrl = new URL(window.location.href)
     shareUrl.hash = `${SHARE_STATE_KEY}=${compressedState}`
@@ -483,7 +475,7 @@ export default function App() {
   }
 
   const exportState = () => {
-    const data: PersistedState = { bikes, referenceId, rider }
+    const data: PersistedState = { bikes, rider }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -511,7 +503,6 @@ export default function App() {
         throw new Error('Invalid import state')
       }
       setBikes(next.bikes)
-      setReferenceId(next.referenceId)
       setRider(next.rider)
     } catch {
       window.alert('Could not import file. Please choose a valid Bike Fit Compare JSON export.')
@@ -708,8 +699,6 @@ export default function App() {
                 onDuplicate={duplicateBike}
                 onMoveUp={(id) => moveBike(id, -1)}
                 onMoveDown={(id) => moveBike(id, 1)}
-                onSetReference={setReferenceId}
-                isReference={referenceId === bike.id}
                 canRemove={bikes.length > 1}
                 canMoveUp={bikes[0]?.id !== bike.id}
                 canMoveDown={bikes[bikes.length - 1]?.id !== bike.id}
@@ -720,7 +709,7 @@ export default function App() {
 
         <section className="main-content">
           <ComparisonChart bikes={derivedBikes} />
-          <ComparisonTable bikes={derivedBikes} referenceId={referenceId} />
+          <ComparisonTable bikes={derivedBikes} />
         </section>
       </section>
     </main>

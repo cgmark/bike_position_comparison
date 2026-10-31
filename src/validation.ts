@@ -24,7 +24,6 @@ export const saddleHeightLimits: NumberLimits = { min: 1 }
 
 export type PersistedState = {
   bikes: BikeInput[]
-  referenceId: string
   rider: RiderSettings
 }
 
@@ -80,17 +79,12 @@ export function validatePersistedState(value: unknown): PersistedState | null {
     return null
   }
 
-  if (typeof value.referenceId !== 'string' || !validBikes.some((bike) => bike.id === value.referenceId)) {
-    return null
-  }
-
   if (!isValidNumber(value.rider.saddleHeight, saddleHeightLimits)) {
     return null
   }
 
   return {
     bikes: validBikes,
-    referenceId: value.referenceId,
     rider: { saddleHeight: value.rider.saddleHeight },
   }
 }

@@ -1,14 +1,12 @@
-import { formatMm, getDelta, getDistance, getEffectiveTopTube } from '../geometry'
+import { formatMm, getDistance, getEffectiveTopTube } from '../geometry'
 import type { DerivedBike } from '../types'
 
 type ComparisonTableProps = {
   bikes: DerivedBike[]
-  referenceId: string
 }
 
-export default function ComparisonTable({ bikes, referenceId }: ComparisonTableProps) {
+export default function ComparisonTable({ bikes }: ComparisonTableProps) {
   const visibleBikes = bikes.filter((bike) => bike.input.visible)
-  const reference = visibleBikes.find((bike) => bike.input.id === referenceId) ?? visibleBikes[0]
 
   return (
     <section className="panel table-panel">
@@ -37,16 +35,10 @@ export default function ComparisonTable({ bikes, referenceId }: ComparisonTableP
               <th>Saddle-Bar Distance</th>
               <th>Saddle-Bar Drop</th>
               <th>Saddle-Bar Horizontal</th>
-              <th>Delta Saddle X</th>
-              <th>Delta Saddle Y</th>
-              <th>Delta Bar X</th>
-              <th>Delta Bar Y</th>
             </tr>
           </thead>
           <tbody>
             {visibleBikes.map((bike) => {
-              const saddleDelta = reference ? getDelta(bike.saddle, reference.saddle) : { x: 0, y: 0 }
-              const stemDelta = reference ? getDelta(bike.stemEnd, reference.stemEnd) : { x: 0, y: 0 }
               const effectiveTopTube = getEffectiveTopTube(
                 bike.input.stack,
                 bike.input.reach,
@@ -62,17 +54,12 @@ export default function ComparisonTable({ bikes, referenceId }: ComparisonTableP
                     <span className="table-bike-name">
                       <span className="legend-swatch" style={{ backgroundColor: bike.input.color }} />
                       {bike.input.name}
-                      {reference?.input.id === bike.input.id ? ' (ref)' : ''}
                     </span>
                   </td>
                   <td>{formatMm(effectiveTopTube)}</td>
                   <td>{formatMm(saddleToBarDistance)}</td>
                   <td>{formatMm(saddleToBarDrop)}</td>
                   <td>{formatMm(saddleToBarHorizontal)}</td>
-                  <td>{formatMm(saddleDelta.x)}</td>
-                  <td>{formatMm(saddleDelta.y)}</td>
-                  <td>{formatMm(stemDelta.x)}</td>
-                  <td>{formatMm(stemDelta.y)}</td>
                 </tr>
               )
             })}
