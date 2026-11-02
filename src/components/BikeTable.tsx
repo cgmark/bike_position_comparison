@@ -35,6 +35,17 @@ const numberFields: NumberField[] = [
 export default function BikeTable({ bikes, onChange, onRemove, onDuplicate, onMove }: BikeTableProps) {
   const [draggedBikeId, setDraggedBikeId] = useState<string | null>(null)
   const [dropTargetId, setDropTargetId] = useState<string | null>(null)
+  const [showDeltas, setShowDeltas] = useState(false)
+  const baseline = bikes[0]
+  const baselineDistance = baseline ? getDistance(baseline.saddle, baseline.stemEnd) : 0
+  const baselineDrop = baseline ? baseline.saddle.y - baseline.stemEnd.y : 0
+  const baselineHorizontal = baseline ? baseline.stemEnd.x - baseline.saddle.x : 0
+
+  const formatComparison = (value: number, baselineValue: number) => {
+    if (!showDeltas) return formatMm(value)
+    const formatted = formatMm(value - baselineValue)
+    return Number(formatted) > 0 ? `+${formatted}` : Number(formatted) === 0 ? '0.0' : formatted
+  }
 
   const handleRemove = (bike: BikeInput) => {
     if (bikes.length > 1 && window.confirm(`Remove ${bike.name}?`)) {
@@ -51,7 +62,22 @@ export default function BikeTable({ bikes, onChange, onRemove, onDuplicate, onMo
               <th className="bike-editor-actions-column" rowSpan={2} />
               <th colSpan={numberFields.length - 2} />
               <th colSpan={3}>Stem</th>
-              <th colSpan={3}>Saddle-to-Bar</th>
+              <th colSpan={3} scope="colgroup">
+                Saddle-to-Bar
+                <button
+                  type="button"
+                  className="comparison-mode-toggle"
+                  role="switch"
+                  aria-checked={showDeltas}
+                  aria-label="Show deltas relative to the first bike"
+                  onClick={() => setShowDeltas((current) => !current)}
+                  title={showDeltas ? `Compared with ${baseline?.input.name ?? 'the first bike'}` : 'Show differences from the first bike'}
+                >
+                  <span>Absolute</span>
+                  <span className="comparison-mode-track" aria-hidden="true"><span /></span>
+                  <span>Delta</span>
+                </button>
+              </th>
             </tr>
             <tr>
               <th className="bike-editor-name-column">Bike</th>
@@ -214,9 +240,9 @@ export default function BikeTable({ bikes, onChange, onRemove, onDuplicate, onMo
                     />
                   </td>
                 ))}
-                  <td className="comparison-value">{formatMm(saddleToBarDistance)}</td>
-                  <td className="comparison-value">{formatMm(saddleToBarDrop)}</td>
-                  <td className="comparison-value">{formatMm(saddleToBarHorizontal)}</td>
+                  <td className="comparison-value">{formatComparison(saddleToBarDistance, baselineDistance)}</td>
+                  <td className="comparison-value">{formatComparison(saddleToBarDrop, baselineDrop)}</td>
+                  <td className="comparison-value">{formatComparison(saddleToBarHorizontal, baselineHorizontal)}</td>
                 </tr>
               )
             })}

@@ -200,6 +200,44 @@ button {
   font-weight: 700;
 }
 
+.comparison-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  padding: 3px;
+  border: 0;
+  background: transparent;
+  color: #e2e8f0;
+  font-size: 0.7rem;
+}
+
+.comparison-mode-track {
+  display: inline-flex;
+  align-items: center;
+  width: 28px;
+  height: 16px;
+  padding: 2px;
+  border-radius: 999px;
+  background: #475569;
+}
+
+.comparison-mode-track span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f8fafc;
+  transition: transform 120ms ease;
+}
+
+.comparison-mode-toggle[aria-checked='true'] .comparison-mode-track {
+  background: #0284c7;
+}
+
+.comparison-mode-toggle[aria-checked='true'] .comparison-mode-track span {
+  transform: translateX(12px);
+}
+
 .bike-editor-table td > input[type='number'] {
   width: 52px;
   padding: 5px 3px;
